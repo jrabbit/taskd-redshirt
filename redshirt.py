@@ -1,13 +1,17 @@
 import logging
 import os
 import shutil
+import socket
 from subprocess import check_output
 
+import baker
+import psutil
 from bottle import request, route, run, static_file, template
 
 logger = logging.getLogger(__name__)
+__version__ = "0.1.0a1"
 
-# saome feature ideas from paul
+# some feature ideas from paul
 #17:56 <pbeckingham> jrabbit: When do my certs expire?
 #17:57 <pbeckingham> jrabbit: Update CIPHERS
 #17:57 <pbeckingham> jrabbit: Is there a new version available?
@@ -17,6 +21,30 @@ logger = logging.getLogger(__name__)
 # maybe as healthcheck for taskd?
 
 # Renew Certs
+
+@route("/meta/version")
+def version():
+    return __version__
+
+@route("/meta/health")
+def self_health_check():
+    return "OK"
+
+
+@route("/health")
+def health_check():
+    check_call(["taskd", "status"])
+
+@route("/version")
+def get_version():
+    """this is actually complicated if we're in a container enviroment.
+       Maybe use taskc?!"""
+    pass
+
+@route("/")
+def index():
+    hostname = socket.gethostname()
+    return "<h1>Welcome to redshirt on {}.<h1>".format(hostname)
 
 @route("/add_user/<org>/<name>")
 def add_user(org, name):
@@ -60,4 +88,4 @@ def install_cert():
 
 if __name__ == '__main__':
     logging.basicConfig()
-    run(host='0.0.0.0', port=int(os.environ.get("PORT", 4000)))
+    run(host='0.0.0.0', port=int(os.environ.get("PORT", 4000)),reloader=True)
