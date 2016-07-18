@@ -33,13 +33,22 @@ def self_health_check():
 
 @route("/health")
 def health_check():
-    check_call(["taskd", "status"])
+    """Returns one of https://pythonhosted.org/psutil/#psutil.STATUS_RUNNING"""
+    taskds = [x for x in psutil.process_iter() if "taskd" ==  x.name()]
+    if len(taskds) > 1:
+        raise NotImplementedError
+    return {"status": taskds[0].status()}
+
 
 @route("/version")
 def get_version():
-    """this is actually complicated if we're in a container enviroment.
+    """this is actually complicated if we're in a container environment.
        Maybe use taskc?!"""
-    pass
+    x = check_output(["taskd", "-v"])
+    l = x.strip().split("\n")[0]
+    # '\x1b[1mtaskd 1.2.0\x1b[0m e2d145b built for linux'
+    g = l.split()
+    return {"version": g[1].split("\x1b")[0], "platform": g[-1], "git_rev": g[2]}
 
 @route("/")
 def index():
