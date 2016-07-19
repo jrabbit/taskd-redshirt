@@ -1,8 +1,9 @@
 import unittest
+import subprocess
 
 import mock
 
-from redshirt import version, self_health_check, health_check, get_version, index, __version__
+from redshirt import version, self_health_check, health_check, get_version, index, __version__, add_user
 
 class TestMetaRoutes(unittest.TestCase):
 
@@ -21,8 +22,14 @@ class TestMetaRoutes(unittest.TestCase):
         self.assertEqual(self_health_check(), "OK")
 
 class TestUserCreateStory(unittest.TestCase):
+    org = "Testusers"
+    user = "Timmy"
+    @mock.patch("redshirt.check_output")
+    def test_add_user(self, patched_check_output):
+        patched_check_output.return_value = "New user key: 570472ff-43b5-43f9-8544-e3b2fa5cc6f2\nCreated user '{}' for organization '{}'\n".format(self.user, self.org)
+        self.assertEqual(add_user(self.org, self.user), "570472ff-43b5-43f9-8544-e3b2fa5cc6f2")
+        patched_check_output.assert_called_with(["taskd", "add", "user", self.org, self.user])
 
-    pass
 
 class TestTaskInfo(unittest.TestCase):
     @mock.patch('redshirt.check_output')
@@ -39,3 +46,12 @@ class TestTaskInfo(unittest.TestCase):
         health_check()
         patched_process_iter.assert_called_with()
 
+
+
+class IntegrationTest(unittest.TestCase):
+    pass
+    # def setUp(self):
+    #     subprocess.check_output(["taskd", "add", "org", self.org], env={"TASKDDATA": "/var/lib/taskd"})
+
+    # def tearDown(self):
+    #     subprocess.check_output(["taskd", "remove", "org", self.org], env={"TASKDDATA": "/var/lib/taskd"})
