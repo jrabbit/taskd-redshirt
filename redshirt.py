@@ -18,7 +18,6 @@ __version__ = "0.1.0a1"
 #17:57 <pbeckingham> jrabbit: User wipe
 
 #17:58 <pbeckingham> jrabbit: Is it running?
-# maybe as healthcheck for taskd?
 
 # Renew Certs
 
@@ -37,7 +36,10 @@ def health_check():
     taskds = [x for x in psutil.process_iter() if "taskd" ==  x.name()]
     if len(taskds) > 1:
         raise NotImplementedError
-    return {"status": taskds[0].status()}
+    elif len(taskds) == 0:
+        return {"status": "not running"}
+    else:
+        return {"status": taskds[0].status()}
 
 
 @route("/version")
