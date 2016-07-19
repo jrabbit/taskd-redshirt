@@ -29,11 +29,14 @@ def version():
 def self_health_check():
     return "OK"
 
+def _get_proc():
+    taskds = [x for x in psutil.process_iter() if "taskd" ==  x.name()]
+    return taskds
 
 @route("/health")
 def health_check():
     """Returns one of https://pythonhosted.org/psutil/#psutil.STATUS_RUNNING"""
-    taskds = [x for x in psutil.process_iter() if "taskd" ==  x.name()]
+    taskds = _get_proc()
     if len(taskds) > 1:
         raise NotImplementedError
     elif len(taskds) == 0:
