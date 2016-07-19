@@ -3,7 +3,7 @@ import subprocess
 
 import mock
 
-from redshirt import version, self_health_check, health_check, get_version, index, __version__, add_user
+from redshirt import version, self_health_check, health_check, get_version, index, __version__, add_user, remove_user
 
 class TestMetaRoutes(unittest.TestCase):
 
@@ -30,6 +30,12 @@ class TestUserCreateStory(unittest.TestCase):
         self.assertEqual(add_user(self.org, self.user), "570472ff-43b5-43f9-8544-e3b2fa5cc6f2")
         patched_check_output.assert_called_with(["taskd", "add", "user", self.org, self.user])
 
+    @mock.patch("redshirt.check_output")
+    def test_rm_user(self, patched_check_output):
+        patched_check_output.return_value = ""
+        self.assertEqual(remove_user(self.org, self.user), "570472ff-43b5-43f9-8544-e3b2fa5cc6f2")
+        patched_check_output.assert_called_with(["taskd", "add", "user", self.org, self.user])
+
 
 class TestTaskInfo(unittest.TestCase):
     @mock.patch('redshirt.check_output')
@@ -40,10 +46,11 @@ class TestTaskInfo(unittest.TestCase):
         self.assertEqual(out, expected)
         patched_check_output.assert_called_with(["taskd", "-v"])
 
-    @mock.patch('psutil.process_iter')
-    def test_health_check(self, patched_process_iter):
+    @mock.patch('redshirt._get_proc')
+    def test_health_check(self, patched_get_proc):
         # patched_process_iter.side_effect = {"taskd"
-        health_check()
+        patched_get_proc.return_value = [Process()]
+        self.assertEqual(health_check(), {"status": ""})
         patched_process_iter.assert_called_with()
 
 
