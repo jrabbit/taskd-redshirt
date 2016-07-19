@@ -66,8 +66,7 @@ class TestTaskInfo(unittest.TestCase):
     def test_health_check(self, patched_get_proc):
         # patched_process_iter.side_effect = {"taskd"
         patched_get_proc.return_value = [psutil.Process()]
-        self.assertEqual(health_check(), {"status": ""})
-        patched_process_iter.assert_called_with()
+        self.assertEqual(health_check(), {"status": "running"})
 
 class TestCerts(unittest.TestCase):
 
