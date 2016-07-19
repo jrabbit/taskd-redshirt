@@ -97,6 +97,15 @@ def install_cert():
         f.write(cert)
     return "OK"
 
-if __name__ == '__main__':
+@route("/user/<user>", method="DELETE")
+def remove_user(user, org):
+    yolo = check_output(["taskd", "remove", user, org])
+
+
+@baker.command(default=True)
+def main(host='0.0.0.0'):
     logging.basicConfig()
-    run(host='0.0.0.0', port=int(os.environ.get("PORT", 4000)),reloader=True)
+    run(host=host, port=int(os.environ.get("PORT", 4000)),reloader=True)
+
+if __name__ == '__main__':
+    baker.run()
