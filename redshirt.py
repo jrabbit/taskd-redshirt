@@ -8,8 +8,8 @@ import baker
 import psutil
 from bottle import request, route, run, static_file, template
 
-logger = logging.getLogger(__name__)
 __version__ = "0.1.0a1"
+logger = logging.getLogger(__name__)
 
 # some feature ideas from paul
 #17:56 <pbeckingham> jrabbit: When do my certs expire?
@@ -62,6 +62,7 @@ def index():
 
 @route("/add_user/<org>/<name>")
 def add_user(org, name):
+    # may fail if group doesn't exist.
     o = check_output(["taskd", "add", "user", org, name])
     uuid = o.split('\n')[0].split()[-1]
     print(uuid)
