@@ -3,7 +3,8 @@ import subprocess
 
 import mock
 
-from redshirt import version, self_health_check, health_check, get_version, index, __version__, add_user, remove_user
+from redshirt import *
+from redshirt import __version__
 
 class TestMetaRoutes(unittest.TestCase):
 
@@ -33,8 +34,23 @@ class TestUserCreateStory(unittest.TestCase):
     @mock.patch("redshirt.check_output")
     def test_rm_user(self, patched_check_output):
         patched_check_output.return_value = ""
-        self.assertEqual(remove_user(self.org, self.user), "570472ff-43b5-43f9-8544-e3b2fa5cc6f2")
-        patched_check_output.assert_called_with(["taskd", "add", "user", self.org, self.user])
+        self.assertEqual(remove_user(self.user, self.org), "OK")
+        patched_check_output.assert_called_with(["taskd", "remove", "user", self.org, self.user])
+
+    @mock.patch("redshirt.check_output")
+    def test_add_org(self, patched_check_output):
+        new_org = "TeamRocket"
+        self.assertEqual(add_org(new_org), "OK")
+        patched_check_output.assert_called_with(["taskd", "add", "org", new_org])
+    
+    @mock.patch("redshirt.check_output")
+    def test_rm_org(self, patched_check_output):
+        new_org = "TeamRocket"
+        self.assertEqual(rm_org(new_org), "OK")
+        patched_check_output.assert_called_with(["taskd", "remove", "org", new_org])
+
+
+        
 
 
 class TestTaskInfo(unittest.TestCase):
@@ -53,6 +69,13 @@ class TestTaskInfo(unittest.TestCase):
         self.assertEqual(health_check(), {"status": ""})
         patched_process_iter.assert_called_with()
 
+class TestCerts(unittest.TestCase):
+
+    # https://stackoverflow.com/questions/37265706/how-can-i-use-mock-open-with-a-python-unittest-decorator
+    @mock.patch('__main__.open',new_callable=mock.mock_open)
+    @mock.patch('bottle.request')
+    def test_install_cert(self, patched_request, mocked_open):
+        self.assertEqual(install_cert(), "OK")
 
 
 class IntegrationTest(unittest.TestCase):

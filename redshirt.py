@@ -103,8 +103,19 @@ def install_cert():
 
 @route("/user/<user>", method="DELETE")
 def remove_user(user, org):
-    yolo = check_output(["taskd", "remove", user, org])
+    yolo = check_output(["taskd", "remove", "user", org, user])
+    return "OK"
 
+@route("/org/<org>", method="POST")
+def add_org(org):
+    check_output(["taskd", "add", "org", org])
+    return "OK"
+
+
+@route("/org/<org>", method="DELETE")
+def rm_org(org):
+    check_output(["taskd", "remove", "org", org])
+    return "OK"
 
 @baker.command(default=True)
 def main(host='0.0.0.0'):
