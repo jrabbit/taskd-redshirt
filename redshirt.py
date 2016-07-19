@@ -61,7 +61,7 @@ def index():
 def add_user(org, name):
     o = check_output(["taskd", "add", "user", org, name])
     uuid = o.split('\n')[0].split()[-1]
-    print uuid
+    print(uuid)
     return uuid
 
 @route("/create_cert/<user>")
