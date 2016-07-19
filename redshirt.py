@@ -65,7 +65,7 @@ def add_user(org, name):
     # may fail if group doesn't exist.
     o = check_output(["taskd", "add", "user", org, name])
     uuid = o.split('\n')[0].split()[-1]
-    print(uuid)
+    logging.info("Created account on taskd: %s", uuid)
     return uuid
 
 @route("/create_cert/<user>")
