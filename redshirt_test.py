@@ -76,6 +76,20 @@ class TestCerts(unittest.TestCase):
         with patch('redshirt.open', mock_open(read_data="this is a test cert"), create=True):
             self.assertEqual(install_cert(), "OK")
 
+
+    @patch('os.remove')
+    @patch('shutil.move')
+    @patch('os.path.exists')
+    @patch('redshirt.check_output')
+    def test_create_cert(self, patched_check_output, patched_exists, patched_move, patched_remove):
+        user = "timmy"
+        pems = "Some lovely PEM data"
+        patched_exists.return_value = False
+        with patch('redshirt.open', mock_open(read_data=pems), create=True):
+            self.assertEqual(create_cert(user), {'certificate': pems,'key': pems})
+            patched_check_output.assert_called_with(['bash', './generate.client', user])
+            patched_move.assert_called()
+
 class IntegrationTest(unittest.TestCase):
     pass
     # def setUp(self):
