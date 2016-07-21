@@ -3,9 +3,9 @@ import subprocess
 import psutil
 
 try:
-    from unittest.mock import patch, mock_open, NonCallableMagicMock
+    from unittest.mock import patch, NonCallableMagicMock, mock_open
 except ImportError:
-    from mock import patch, mock_open, NonCallableMagicMock
+    from mock import patch, NonCallableMagicMock, mock_open
 
 from redshirt import *
 from redshirt import __version__
@@ -83,12 +83,15 @@ class TestCerts(unittest.TestCase):
     @patch('redshirt.check_output')
     def test_create_cert(self, patched_check_output, patched_exists, patched_move, patched_remove):
         user = "timmy"
-        pems = "Some lovely PEM data"
+        cert = "Some lovely cert data"
+        key = "Some lovely key data"
+        reads = [cert, key]
         patched_exists.return_value = False
-        with patch('redshirt.open', mock_open(read_data=pems), create=True):
-            self.assertEqual(create_cert(user), {'certificate': pems,'key': pems})
-            patched_check_output.assert_called_with(['bash', './generate.client', user])
-            patched_move.assert_called()
+        with patch('redshirt.open', mock_open(), create=True) as m_open:
+            m_open.return_value.read.side_effect = lambda: reads.pop(0)
+            self.assertEqual(create_cert(user), {'certificate': cert,'key': key})
+            patched_check_output.assert_called_with(['bash', './generate.client', user], cwd="/var/lib/taskd/pki/")
+            patched_move.assert_called_with("/var/lib/taskd/pki/{}.cert.pem".format(user), "/var/lib/taskd/")
 
 class IntegrationTest(unittest.TestCase):
     pass
