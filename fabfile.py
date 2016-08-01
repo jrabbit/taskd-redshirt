@@ -9,7 +9,7 @@ docker_name = "gcr.io/stable-dogfish-697/redshirt:latest"
 
 @task
 def build():
-    local("docker build -t {}".format(docker_name))
+    local("docker build -t {} .".format(docker_name))
 
 @task
 def push():
