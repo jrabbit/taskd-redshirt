@@ -117,7 +117,7 @@ def rm_org(org):
     check_output(["taskd", "remove", "org", org])
     return "OK"
 
-@baker.command(default=True)
+@baker.command(default=True, shortopts={"host": "b",})
 def main(host='0.0.0.0'):
     # app = bottle.app()
     # if os.getenv("OPBEAT", False):
