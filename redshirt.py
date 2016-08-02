@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 #17:56 <pbeckingham> jrabbit: When do my certs expire?
 #17:57 <pbeckingham> jrabbit: Update CIPHERS
 #17:57 <pbeckingham> jrabbit: Is there a new version available?
-#17:57 <pbeckingham> jrabbit: User wipe
 
 #17:58 <pbeckingham> jrabbit: Is it running?
 
@@ -104,6 +103,11 @@ def install_cert():
 @route("/user/<user>", method="DELETE")
 def remove_user(user, org):
     yolo = check_output(["taskd", "remove", "user", org, user])
+    return "OK"
+
+@route("/user_data/<org>/<uuid>", method="DELETE")
+def wipe_data(org, uuid):
+    shutil.rmtree(os.path.join(DATA_DIR, "orgs", org, uuid))
     return "OK"
 
 @route("/org/<org>", method="POST")
