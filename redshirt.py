@@ -10,6 +10,7 @@ from bottle import request, route, run, static_file, template
 
 __version__ = "0.1.0a1"
 logger = logging.getLogger(__name__)
+DATA_DIR = os.getenv("TASKDDATA", "/var/lib/taskd")
 
 # some feature ideas from paul
 #17:56 <pbeckingham> jrabbit: When do my certs expire?
@@ -70,10 +71,11 @@ def add_user(org, name):
 @route("/create_cert/<user>")
 def create_cert(user):
     """Creates a user cert/key pair with certtool and the taskd pki package."""
-    check_output(['bash', './generate.client', user], cwd="/var/lib/taskd/pki/")
+    pki_path = os.path.join(DATA_DIR, "pki/")
+    check_output(['bash', './generate.client', user], cwd=pki_path)
     logger.info(user)
-    cert = "/var/lib/taskd/pki/{}.cert.pem".format(user)
-    key = "/var/lib/taskd/pki/{}.key.pem".format(user)
+    cert = os.path.join(pki_path, "{}.cert.pem".format(user))
+    key = os.path.join(pki_path, "{}.key.pem".format(user))
     with open(cert) as f_cert, open(key) as f_key:
         d = {
             'certificate': f_cert.read(),
@@ -83,10 +85,10 @@ def create_cert(user):
     if os.path.exists(cert_dst):
         logger.info("Overwriting: %s", cert_dst)
         os.remove(cert_dst)
-    shutil.move(os.path.join("/var/lib/taskd/pki","{}.cert.pem".format(user)), "/var/lib/taskd/")
-    os.remove("/var/lib/taskd/pki/{}.key.pem".format(user))
+    shutil.move(os.path.join(pki_path, "{}.cert.pem".format(user)), DATA_DIR)
+    os.remove(os.path.join(pki_path, "{}.key.pem".format(user)))
     # Delete useless certtool template file
-    os.remove("/var/lib/taskd/pki/{}.template".format(user))
+    os.remove(os.path.join(pki_path, "{}.template".format(user)))
     return d
 
 
@@ -95,12 +97,12 @@ def install_cert():
     """Install an externally generated cert"""
     cert = request.POST.get("cert")
     uuid = request.POST.get("uuid")
-    p = os.path.join("/var/lib/taskd", "{0}.cert.pem".format(uuid))
+    p = os.path.join(DATA_DIR, "{0}.cert.pem".format(uuid))
     with open(p, 'w') as f:
         f.write(cert)
     return "OK"
 
-@route("/user/<user>", method="DELETE")
+@route("/user/<org>/<user>", method="DELETE")
 def remove_user(user, org):
     yolo = check_output(["taskd", "remove", "user", org, user])
     return "OK"
