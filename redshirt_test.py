@@ -53,6 +53,12 @@ class TestUserCreateStory(unittest.TestCase):
         self.assertEqual(rm_org(new_org), "OK")
         patched_check_output.assert_called_with(["taskd", "remove", "org", new_org])
 
+    @patch("shutil.rmtree")
+    def test_wipe_data(self, patched_rmtree):
+        uuid = "b6260bb1-95d3-4c7e-a01d-de09ef1fe6a7"
+        self.assertEqual(wipe_data(self.org, uuid), "OK")
+        patched_rmtree.assert_called_with(os.path.join(DATA_DIR, "orgs", self.org, uuid))
+
 class TestTaskInfo(unittest.TestCase):
     @patch('redshirt.check_output')
     def test_version(self, patched_check_output):
@@ -91,7 +97,7 @@ class TestCerts(unittest.TestCase):
             m_open.return_value.read.side_effect = lambda: reads.pop(0)
             self.assertEqual(create_cert(user), {'certificate': cert,'key': key})
             patched_check_output.assert_called_with(['bash', './generate.client', user], cwd="/var/lib/taskd/pki/")
-            patched_move.assert_called_with("/var/lib/taskd/pki/{}.cert.pem".format(user), "/var/lib/taskd/")
+            patched_move.assert_called_with("/var/lib/taskd/pki/{}.cert.pem".format(user), "/var/lib/taskd")
 
 class IntegrationTest(unittest.TestCase):
     pass
