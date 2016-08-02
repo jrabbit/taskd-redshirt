@@ -119,8 +119,16 @@ def rm_org(org):
 
 @baker.command(default=True)
 def main(host='0.0.0.0'):
+    # app = bottle.app()
+    # if os.getenv("OPBEAT", False):
+    #     app.catchall = False #Now most exceptions are re-raised within bottle.
+    #     opbeat_client = Client(organization_id=os.getenv(OPBEAT_ORG_ID),
+    #                            app_id=os.getenv(OPBEAT_ORG_ID),
+    #                            secret_token=os.getenv(OPBEAT_ORG_ID))
+    #     app = Opbeat(app, opbeat_client) #Replace this with a middleware of your choice (see below)
+    
     logging.basicConfig()
-    run(host=host, port=int(os.environ.get("PORT", 4000)),reloader=True)
+    run(host=host, port=int(os.getenv("PORT", 4000)),reloader=True)
 
 if __name__ == '__main__':
     baker.run()
