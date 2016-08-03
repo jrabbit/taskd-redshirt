@@ -52,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'taskd-redshirt'
+project = u'redshirt'
 copyright = u'2016, Jack Laxson'
 author = u'Jack Laxson'
 
