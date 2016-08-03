@@ -18,3 +18,7 @@ def push():
 @task
 def login():
     local("docker login -u oauth2accesstoken -p '$(gcloud auth print-access-token)' https://gcr.io")
+
+@task
+def docsauto():
+    local("sphinx-autobuild -p 4444 -B -b html -d docs/build/doctrees   docs/source build/html")
