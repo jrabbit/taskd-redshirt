@@ -5,7 +5,9 @@ import socket
 from subprocess import check_output
 
 import baker
+import packaging.version
 import psutil
+import requests
 from bottle import request, route, run, static_file, template
 
 __version__ = "0.1.0a1"
@@ -56,6 +58,11 @@ def get_version():
     g = l.split()
     return {"version": g[1].split(b"\x1b")[0], "platform": g[-1], "git_rev": g[2]}
 
+def check_for_update():
+    ret = requests.get("https://tasktools.org/latest/taskd")
+    remote_version = packaging.version.parse(ret.text)
+    local_version = packaging.version.parse(get_version()["version"])
+    print(remote_version, local_version)
 
 @route("/")
 def index():
