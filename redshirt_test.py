@@ -62,9 +62,9 @@ class TestUserCreateStory(unittest.TestCase):
 class TestTaskInfo(unittest.TestCase):
     @patch('redshirt.check_output')
     def test_version(self, patched_check_output):
-        patched_check_output.return_value = "\n\x1b[1mtaskd 1.2.0\x1b[0m e2d145b built for linux\nCopyright (C) 2010 - 2016 G\xc3\xb6teborg Bit Factory.\n\nTaskd may be copied only under the terms of the MIT license, which may be found in the taskd source kit.\nDocumentation for taskd can be found using 'man taskd' or at http://taskwarrior.org\n\n"
+        patched_check_output.return_value = b"\n\x1b[1mtaskd 1.2.0\x1b[0m e2d145b built for linux\nCopyright (C) 2010 - 2016 G\xc3\xb6teborg Bit Factory.\n\nTaskd may be copied only under the terms of the MIT license, which may be found in the taskd source kit.\nDocumentation for taskd can be found using 'man taskd' or at http://taskwarrior.org\n\n"
         out = get_version()
-        expected = {'git_rev': 'e2d145b', 'platform': 'linux', 'version': '1.2.0'}
+        expected = {'git_rev': b'e2d145b', 'platform': b'linux', 'version': b'1.2.0'}
         self.assertEqual(out, expected)
         patched_check_output.assert_called_with(["taskd", "-v"])
 

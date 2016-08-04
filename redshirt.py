@@ -50,10 +50,12 @@ def get_version():
     """this is actually complicated if we're in a container environment.
        Maybe use taskc?!"""
     x = check_output(["taskd", "-v"])
-    l = x.strip().split("\n")[0]
+    l = x.strip().splitlines()[0]
+    # print(l)
     # '\x1b[1mtaskd 1.2.0\x1b[0m e2d145b built for linux'
     g = l.split()
-    return {"version": g[1].split("\x1b")[0], "platform": g[-1], "git_rev": g[2]}
+    return {"version": g[1].split(b"\x1b")[0], "platform": g[-1], "git_rev": g[2]}
+
 
 @route("/")
 def index():
