@@ -62,7 +62,12 @@ def check_for_update():
     ret = requests.get("https://tasktools.org/latest/taskd")
     remote_version = packaging.version.parse(ret.text)
     local_version = packaging.version.parse(get_version()["version"])
-    print(remote_version, local_version)
+    logger.debug("Comparing (local) %s and (remote) %s versions of taskd",
+                 local_version, remote_version)
+    if remote_version > local_version:
+        return True
+    else:
+        return False
 
 @route("/")
 def index():
