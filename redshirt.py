@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import logging
 import os
 import shutil
@@ -10,7 +12,7 @@ import psutil
 import requests
 from bottle import request, route, run, static_file, template
 
-__version__ = "0.1.0a1"
+__version__ = "0.1.0a2"
 logger = logging.getLogger(__name__)
 DATA_DIR = os.getenv("TASKDDATA", "/var/lib/taskd")
 
