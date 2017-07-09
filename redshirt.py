@@ -10,9 +10,9 @@ import baker
 import packaging.version
 import psutil
 import requests
-from bottle import request, route, run, static_file, template
+from bottle import request, route, run, static_file, template, default_app
 
-__version__ = "0.1.0a2"
+__version__ = "0.1.0a3"
 logger = logging.getLogger(__name__)
 DATA_DIR = os.getenv("TASKDDATA", "/var/lib/taskd")
 
@@ -149,8 +149,11 @@ def main(host='0.0.0.0'):
     #                            secret_token=os.getenv(OPBEAT_ORG_ID))
     #     app = Opbeat(app, opbeat_client) #Replace this with a middleware of your choice (see below)
     
-    logging.basicConfig()
+    # logging.basicConfig()
     run(host=host, port=int(os.getenv("PORT", 4000)),reloader=True)
+
+logging.basicConfig()
+app = default_app()
 
 if __name__ == '__main__':
     baker.run()
