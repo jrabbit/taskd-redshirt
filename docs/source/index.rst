@@ -20,6 +20,8 @@ redshirt is on the docker hub::
     docker pull jrabbit/redshirt
 
 
+
+
 docker-compose
 ==============
 .. note::
@@ -37,6 +39,14 @@ your docker-compose.yml should look like
             volumes:
                 - ./pki:/var/lib/taskd/pki
                 - certs:/var/lib/taskd
+            security_opt:
+                - no-new-privileges
+            healthcheck:
+                test: curl -f http://localhost:4000/meta/health
+                interval: 1m30s
+                timeout: 10s
+                retries: 3
+
         taskd:
             image: "jrabbit/taskd:latest"
             ports:
@@ -50,13 +60,16 @@ your docker-compose.yml should look like
 Usage
 =====
 
-``gunicorn -b 0.0.0.0:4000 redshirt:app`` in /usr/src/redshirt
+Run ``gunicorn -b 0.0.0.0:4000 redshirt:app`` in ``/usr/src/redshirt``.
 This is the default for the container! Make sure to forward port 4000 like ``-p 4000:4000``
 
 
 Options
 -------
-  See gunicorn for configuration options.
+
+See gunicorn_ for configuration options.
+
+.. _gunicorn: http://docs.gunicorn.org/en/latest/run.html
 
 Indices and tables
 ==================
