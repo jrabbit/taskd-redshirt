@@ -6,13 +6,13 @@ import shutil
 import socket
 from subprocess import check_output
 
-import baker
+import click
 import packaging.version
 import psutil
 import requests
 from bottle import request, route, run, static_file, template, default_app
 
-__version__ = "0.1.0a3"
+__version__ = "0.1.2"
 logger = logging.getLogger(__name__)
 DATA_DIR = os.getenv("TASKDDATA", "/var/lib/taskd")
 
@@ -139,8 +139,16 @@ def rm_org(org):
     check_output(["taskd", "remove", "org", org])
     return "OK"
 
-@baker.command(default=True, shortopts={"host": "b",})
-def main(host='0.0.0.0'):
+@click.command()
+@click.option('--debug', default=False, is_flag=True)
+@click.option('--verbose/--silent', default=True)
+@click.option('--port', default=4000)
+@click.option("--host", default='0.0.0.0')
+def main(host, port, verbose, debug):
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
+    if verbose:
+        logging.basicConfig(level=logging.INFO)
     # app = bottle.app()
     # if os.getenv("OPBEAT", False):
     #     app.catchall = False #Now most exceptions are re-raised within bottle.
@@ -148,12 +156,10 @@ def main(host='0.0.0.0'):
     #                            app_id=os.getenv(OPBEAT_ORG_ID),
     #                            secret_token=os.getenv(OPBEAT_ORG_ID))
     #     app = Opbeat(app, opbeat_client) #Replace this with a middleware of your choice (see below)
-    
-    # logging.basicConfig()
-    run(host=host, port=int(os.getenv("PORT", 4000)),reloader=True)
+    run(host=host, port=int(os.getenv("PORT", port)),reloader=True)
 
 logging.basicConfig()
 app = default_app()
 
 if __name__ == '__main__':
-    baker.run()
+    main()

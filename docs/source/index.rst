@@ -10,15 +10,14 @@ Welcome to redshirt's documentation!
    :maxdepth: 2
 
 ``redshirt`` is a http api for taskd user management. 
-It should be placed on a closed port or bound to localhost or you may use Docker.
 
 
 Installation
 ============
 
-redshirt is on the cheeseshop! simply::
+redshirt is on the docker hub::
 
-    pip install redshirt
+    docker pull jrabbit/redshirt
 
 
 docker-compose
@@ -51,12 +50,13 @@ your docker-compose.yml should look like
 Usage
 =====
 
-``python redshirt.py <-b>``
+``gunicorn -b 0.0.0.0:4000 redshirt:app`` in /usr/src/redshirt
+This is the default for the container! Make sure to forward port 4000 like ``-p 4000:4000``
 
 
 Options
 -------
-  * :option:`-b` -- IP address to bind to. passed directly to ``bottle.run`` -- Default: 0.0.0.0
+  See gunicorn for configuration options.
 
 Indices and tables
 ==================

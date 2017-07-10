@@ -17,7 +17,7 @@ def push():
 
 @task
 def login():
-    local("docker login -u oauth2accesstoken -p '$(gcloud auth print-access-token)' https://gcr.io")
+    local("gcloud docker -a")
 
 @task
 def docsauto():

@@ -17,6 +17,6 @@ EXPOSE 4000
 VOLUME /var/lib/taskd
 ENV TASKDDATA="/var/lib/taskd"
 
-WORKDIR /var/lib/taskd
+WORKDIR /usr/src/redshirt
 
-CMD ["python2.7",  "/usr/src/redshirt/redshirt.py"]
+CMD ["gunicorn", "-b 0.0.0.0:4000", "redshirt:app"]
