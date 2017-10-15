@@ -1,0 +1,139 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "65ee4f9840d9db8b06ee61b3eec4ad636efd558df3478a7936ef7fb58c8e45b1"
+        },
+        "host-environment-markers": {
+            "implementation_name": "cpython",
+            "implementation_version": "0",
+            "os_name": "posix",
+            "platform_machine": "x86_64",
+            "platform_python_implementation": "CPython",
+            "platform_release": "4.13.0-1-amd64",
+            "platform_system": "Linux",
+            "platform_version": "#1 SMP Debian 4.13.4-1 (2017-10-01)",
+            "python_full_version": "2.7.13",
+            "python_version": "2.7",
+            "sys_platform": "linux2"
+        },
+        "pipfile-spec": 6,
+        "requires": {},
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.python.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "baker": {
+            "hashes": [
+                "sha256:190809fe94ad0fbcfb385e76e5b8016d06359523dc582c8c40c8be5e0bcace45",
+                "sha256:2d81e99af7d7d6441297a0c13de023fe3f1510718e89d2baacea917ee09d154d"
+            ],
+            "version": "==1.3"
+        },
+        "bottle": {
+            "hashes": [
+                "sha256:39b751aee0b167be8dffb63ca81b735bbf1dd0905b3bc42761efedee8f123355"
+            ],
+            "version": "==0.12.13"
+        },
+        "certifi": {
+            "hashes": [
+                "sha256:54a07c09c586b0e4c619f02a5e94e36619da8e2b053e20f594348c0611803704",
+                "sha256:40523d2efb60523e113b44602298f0960e900388cf3bb6043f645cf57ea9e3f5"
+            ],
+            "version": "==2017.7.27.1"
+        },
+        "chardet": {
+            "hashes": [
+                "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691",
+                "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae"
+            ],
+            "version": "==3.0.4"
+        },
+        "gunicorn": {
+            "hashes": [
+                "sha256:75af03c99389535f218cc596c7de74df4763803f7b63eb09d77e92b3956b36c6",
+                "sha256:eee1169f0ca667be05db3351a0960765620dad53f53434262ff8901b68a1b622"
+            ],
+            "version": "==19.7.1"
+        },
+        "idna": {
+            "hashes": [
+                "sha256:cc19709fd6d0cbfed39ea875d29ba6d4e22c0cebc510a76d6302a28385e8bb70",
+                "sha256:3cb5ce08046c4e3a560fc02f138d0ac63e00f8ce5901a56b32ec8b7994082aab"
+            ],
+            "version": "==2.5"
+        },
+        "psutil": {
+            "hashes": [
+                "sha256:99c2ab6c8f0d60e0c86775f8e5844e266af48cc1d9ecd1be209cd407a3e9c9a1",
+                "sha256:a91474d34bf1bc86a0d95e2c198a70723208f9dc9e50258c2060a1bab3796f81",
+                "sha256:c987f0691c01cbe81813b0c895208c474240c96e26f7d1e945e8dabee5c85437",
+                "sha256:233a943d3e6636d648f05515a4d21b4dda63499d8ca38d6890a57a3f78a9cceb",
+                "sha256:1893fe42b0fb5f11bf84ffe770be5b2e27fb7ec959ba8bf620b704552b738c72",
+                "sha256:1345217075dd5bb4fecbf7cb0fe4c0c170e93ec57d48494756f4b617cd21b449",
+                "sha256:c9c4274f5f95a171437c90f65c3e9b71a871753f0a827f930e1b14aa43041eab",
+                "sha256:5984ee7b2880abcdaa0819315f69a5f37da963863495c2294392cb3e98141a95",
+                "sha256:86197ae5978f216d33bfff4383d5cc0b80f079d09cf45a2a406d1abb5d0299f0",
+                "sha256:da6ee62fb5ffda188c39aacb0499d401c131046e922ba53fb4b908937e771f94",
+                "sha256:6f36fa29aa9ca935405a3cebe03cfbc6dde27088f9ad3d9b2d3baa47d4b89914",
+                "sha256:63b75c5374fafdaf3f389229b592f19b88a8c7951d1b973b9113df649ade5cb9",
+                "sha256:6d0e1e9bbdab5a7d40b57d8f0841eb9e11c2395ac7ec0ddd396116240d733f46",
+                "sha256:1ad0075b6c86c0ea5076149ec39dcecf0c692711c34317d43d73a4d8c4d4ec30",
+                "sha256:02c042e1f6c68c807de5caf45547971cf02977abf4cd92c8961186af9c91c488",
+                "sha256:2bcfeff969f3718bb31effea752d92511f375547d337687db1bd99ccd85b7ad7",
+                "sha256:34736b91c9785ede9d859a79e28129390f609339014f904c276ad46d0a440730"
+            ],
+            "version": "==4.3.0"
+        },
+        "requests": {
+            "hashes": [
+                "sha256:6afd3371c1f4c1970497cdcace5c5ecbbe58267bf05ca1abd93d99d170803ab7",
+                "sha256:c6f3bdf4a4323ac7b45d01e04a6f6c20e32a052cd04de81e05103abc049ad9b9"
+            ],
+            "version": "==2.18.1"
+        },
+        "urllib3": {
+            "hashes": [
+                "sha256:8ed6d5c1ff9d6ba84677310060d6a3a78ca3072ce0684cb3c645023009c114b1",
+                "sha256:b14486978518ca0901a76ba973d7821047409d7f726f22156b24e83fd71382a5"
+            ],
+            "version": "==1.21.1"
+        }
+    },
+    "develop": {
+        "funcsigs": {
+            "hashes": [
+                "sha256:330cc27ccbf7f1e992e69fef78261dc7c6569012cf397db8d3de0234e6c937ca",
+                "sha256:a7bb0f2cf3a3fd1ab2732cb49eba4252c2af4240442415b4abce3b87022a8f50"
+            ],
+            "markers": "python_version < '3.3'",
+            "version": "==1.0.2"
+        },
+        "mock": {
+            "hashes": [
+                "sha256:5ce3c71c5545b472da17b72268978914d0252980348636840bd34a00b5cc96c1",
+                "sha256:b158b6df76edd239b8208d481dc46b6afd45a846b7812ff0ce58971cf5bc8bba"
+            ],
+            "version": "==2.0.0"
+        },
+        "pbr": {
+            "hashes": [
+                "sha256:60c25b7dfd054ef9bb0ae327af949dd4676aa09ac3a9471cdc871d8a9213f9ac",
+                "sha256:05f61c71aaefc02d8e37c0a3eeb9815ff526ea28b3b76324769e6158d7f95be1"
+            ],
+            "version": "==3.1.1"
+        },
+        "six": {
+            "hashes": [
+                "sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb",
+                "sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
+            ],
+            "version": "==1.11.0"
+        }
+    }
+}
