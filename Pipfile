@@ -5,6 +5,8 @@ name = "pypi"
 
 [dev-packages]
 mock = "*"
+coverage = "*"
+
 
 [packages]
 
