@@ -3,7 +3,7 @@ from fabric.contrib import project
 
 @task
 def update_deps():
-    local("docker pull debian") # for redshirt
+    local("docker pull debian:stretch") # for redshirt
 
 docker_name = "gcr.io/stable-dogfish-697/redshirt:latest"
 
