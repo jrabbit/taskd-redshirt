@@ -12,7 +12,7 @@ import psutil
 import requests
 from bottle import request, route, run, static_file, template, default_app, HTTPError
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 logger = logging.getLogger(__name__)
 DATA_DIR = os.getenv("TASKDDATA", "/var/lib/taskd")
 
@@ -37,6 +37,13 @@ def _get_proc():
     taskds = [x for x in psutil.process_iter() if "taskd" ==  x.name()]
     return taskds
 
+def _call_or_503(cmd):
+    try:
+        return check_output(cmd)
+    except OSError as e:
+        logger.error("You don't seem to have taskd installed? Check your $PATH.")
+        raise HTTPError(status=503, body="You don't seem to have taskd installed? Check your $PATH.")
+
 @route("/health")
 def health_check():
     """Returns one of https://pythonhosted.org/psutil/#psutil.STATUS_RUNNING"""
@@ -53,11 +60,7 @@ def health_check():
 def get_version():
     """this is actually complicated if we're in a container environment.
        Maybe use taskc?!"""
-    try:
-        x = check_output(["taskd", "-v"])
-    except OSError as e:
-        logger.error("You don't seem to have taskd installed? Check your $PATH.")
-        raise HTTPError(status=503, body="You don't seem to have taskd installed? Check your $PATH.")
+    x = _call_or_503(["taskd", "-v"])
     l = x.strip().splitlines()[0]
     # print(l)
     # '\x1b[1mtaskd 1.2.0\x1b[0m e2d145b built for linux'
@@ -83,7 +86,7 @@ def index():
 @route("/add_user/<org>/<name>")
 def add_user(org, name):
     # may fail if group doesn't exist.
-    o = check_output(["taskd", "add", "user", org, name])
+    o = _call_or_503(["taskd", "add", "user", org, name])
     uuid = o.split('\n')[0].split()[-1]
     logging.info("Created account on taskd: %s", uuid)
     return uuid
@@ -124,7 +127,7 @@ def install_cert():
 
 @route("/user/<org>/<user>", method="DELETE")
 def remove_user(user, org):
-    yolo = check_output(["taskd", "remove", "user", org, user])
+    yolo = _call_or_503(["taskd", "remove", "user", org, user])
     return "OK"
 
 @route("/user_data/<org>/<uuid>", method="DELETE")
@@ -134,13 +137,13 @@ def wipe_data(org, uuid):
 
 @route("/org/<org>", method="POST")
 def add_org(org):
-    check_output(["taskd", "add", "org", org])
+    _call_or_503(["taskd", "add", "org", org])
     return "OK"
 
 
 @route("/org/<org>", method="DELETE")
 def rm_org(org):
-    check_output(["taskd", "remove", "org", org])
+    _call_or_503(["taskd", "remove", "org", org])
     return "OK"
 
 @click.command()

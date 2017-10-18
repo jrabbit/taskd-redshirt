@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name="redshirt",
-      version="0.1.0a3",
+      version="0.1.3b1",
       scripts=['redshirt.py'],
       author="Jack Laxson",
       author_email="jack@getpizza.cat",
