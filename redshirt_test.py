@@ -68,6 +68,12 @@ class TestTaskInfo(unittest.TestCase):
         self.assertEqual(out, expected)
         patched_check_output.assert_called_with(["taskd", "-v"])
 
+    @patch('redshirt.check_output')
+    def test_version_no_taskd(self, patched_check_output):
+        patched_check_output.side_effect = OSError
+        with self.assertRaises(HTTPError):
+            out = get_version()
+
     @patch('redshirt._get_proc')
     def test_health_check(self, patched_get_proc):
         # patched_process_iter.side_effect = {"taskd"

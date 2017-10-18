@@ -10,7 +10,7 @@ import click
 import packaging.version
 import psutil
 import requests
-from bottle import request, route, run, static_file, template, default_app
+from bottle import request, route, run, static_file, template, default_app, HTTPError
 
 __version__ = "0.1.2"
 logger = logging.getLogger(__name__)
@@ -53,7 +53,11 @@ def health_check():
 def get_version():
     """this is actually complicated if we're in a container environment.
        Maybe use taskc?!"""
-    x = check_output(["taskd", "-v"])
+    try:
+        x = check_output(["taskd", "-v"])
+    except OSError as e:
+        logger.error("You don't seem to have taskd installed? Check your $PATH.")
+        raise HTTPError(status=503, body="You don't seem to have taskd installed? Check your $PATH.")
     l = x.strip().splitlines()[0]
     # print(l)
     # '\x1b[1mtaskd 1.2.0\x1b[0m e2d145b built for linux'
