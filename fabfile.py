@@ -16,6 +16,11 @@ def push():
     local("docker push {}".format(docker_name))
 
 @task
+def publish():
+    local("docker tag {} jrabbit/redshirt".format(docker_name))
+    local("docker push jrabbit/redshirt")
+
+@task
 def login():
     local("gcloud docker -a")
 
