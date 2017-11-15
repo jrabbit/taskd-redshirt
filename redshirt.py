@@ -16,8 +16,6 @@ from opbeat import Client
 from opbeat.middleware import Opbeat
 from opbeat.handlers.logging import OpbeatHandler
 
-from utils import OpbeatBottle
-
 
 __version__ = "0.2.0"
 logger = logging.getLogger(__name__)
@@ -208,8 +206,6 @@ if os.getenv("REDSHIRT_OPBEAT", False):
 
     handler = OpbeatHandler(client)
     logger.addHandler(handler)
-
-    # install(OpbeatBottle(client))
 
     app = Opbeat(app, client)
 
