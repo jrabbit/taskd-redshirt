@@ -10,39 +10,53 @@ import click
 import packaging.version
 import psutil
 import requests
-from bottle import request, route, run, static_file, template, default_app, HTTPError
+from bottle import (HTTPError, default_app, request, route, run, static_file,
+                    template, install, hook, response)
+from opbeat import Client
+from opbeat.middleware import Opbeat
+from opbeat.handlers.logging import OpbeatHandler
 
-__version__ = "0.1.3"
+from utils import OpbeatBottle
+
+
+__version__ = "0.2.0"
 logger = logging.getLogger(__name__)
 DATA_DIR = os.getenv("TASKDDATA", "/var/lib/taskd")
 
 # some feature ideas from paul
-#17:56 <pbeckingham> jrabbit: When do my certs expire?
-#17:57 <pbeckingham> jrabbit: Update CIPHERS
-#17:57 <pbeckingham> jrabbit: Is there a new version available?
+# 17:56 <pbeckingham> jrabbit: When do my certs expire?
+# 17:57 <pbeckingham> jrabbit: Update CIPHERS
+# 17:57 <pbeckingham> jrabbit: Is there a new version available?
 
-#17:58 <pbeckingham> jrabbit: Is it running?
+# 17:58 <pbeckingham> jrabbit: Is it running?
 
 # Renew Certs
+
 
 @route("/meta/version")
 def version():
     return __version__
 
+
 @route("/meta/health")
 def self_health_check():
     return "OK"
 
+
 def _get_proc():
-    taskds = [x for x in psutil.process_iter() if "taskd" ==  x.name()]
+    taskds = [x for x in psutil.process_iter() if "taskd" == x.name()]
     return taskds
+
 
 def _call_or_503(cmd):
     try:
         return check_output(cmd)
     except OSError as e:
-        logger.error("You don't seem to have taskd installed? Check your $PATH.")
-        raise HTTPError(status=503, body="You don't seem to have taskd installed? Check your $PATH.")
+        logger.error(
+            "You don't seem to have taskd installed? Check your $PATH.", exc_info=True)
+        raise HTTPError(
+            status=503, body="You don't seem to have taskd installed? Check your $PATH.")
+
 
 @route("/health")
 def health_check():
@@ -67,6 +81,7 @@ def get_version():
     g = l.split()
     return {"version": g[1].split(b"\x1b")[0], "platform": g[-1], "git_rev": g[2]}
 
+
 def check_for_update():
     ret = requests.get("https://tasktools.org/latest/taskd")
     remote_version = packaging.version.parse(ret.text)
@@ -78,10 +93,17 @@ def check_for_update():
     else:
         return False
 
+
 @route("/")
 def index():
     hostname = socket.gethostname()
     return "<h1>Welcome to redshirt on {}.<h1>".format(hostname)
+
+
+@route("/exception")
+def exception():
+    1 / 0
+
 
 @route("/add_user/<org>/<name>")
 def add_user(org, name):
@@ -90,6 +112,7 @@ def add_user(org, name):
     uuid = o.split('\n')[0].split()[-1]
     logging.info("Created account on taskd: %s", uuid)
     return uuid
+
 
 @route("/create_cert/<user>")
 def create_cert(user):
@@ -125,15 +148,18 @@ def install_cert():
         f.write(cert)
     return "OK"
 
+
 @route("/user/<org>/<user>", method="DELETE")
 def remove_user(user, org):
     yolo = _call_or_503(["taskd", "remove", "user", org, user])
     return "OK"
 
+
 @route("/user_data/<org>/<uuid>", method="DELETE")
 def wipe_data(org, uuid):
     shutil.rmtree(os.path.join(DATA_DIR, "orgs", org, uuid))
     return "OK"
+
 
 @route("/org/<org>", method="POST")
 def add_org(org):
@@ -146,6 +172,7 @@ def rm_org(org):
     _call_or_503(["taskd", "remove", "org", org])
     return "OK"
 
+
 @click.command()
 @click.option('--debug', default=False, is_flag=True)
 @click.option('--verbose/--silent', default=True)
@@ -156,17 +183,35 @@ def main(host, port, verbose, debug):
         logging.basicConfig(level=logging.DEBUG)
     if verbose:
         logging.basicConfig(level=logging.INFO)
-    # app = bottle.app()
-    # if os.getenv("OPBEAT", False):
-    #     app.catchall = False #Now most exceptions are re-raised within bottle.
-    #     opbeat_client = Client(organization_id=os.getenv(OPBEAT_ORG_ID),
-    #                            app_id=os.getenv(OPBEAT_ORG_ID),
-    #                            secret_token=os.getenv(OPBEAT_ORG_ID))
-    #     app = Opbeat(app, opbeat_client) #Replace this with a middleware of your choice (see below)
-    run(host=host, port=int(os.getenv("PORT", port)),reloader=True)
 
-logging.basicConfig()
+    run(host=host, port=int(os.getenv("PORT", port)), reloader=True)
+
+
+@hook("after_request")
+def close_txn():
+    client.end_transaction(request.path, response.status_code)
+
+@hook("before_request")
+def open_txn():
+    client.begin_transaction("web.bottle")
+
+logging.basicConfig(level=logging.DEBUG)
 app = default_app()
+if os.getenv("REDSHIRT_OPBEAT", False):
+    logger.info("OPBEAT enabled!")
+    app.catchall = False  # Now most exceptions are re-raised within bottle.
+    client = Client(
+        organization_id=os.getenv("OPBEAT_ORG_ID"),
+        app_id=os.getenv("OPBEAT_APP_ID"),
+        secret_token=os.getenv("OPBEAT_SECRET_TOKEN"),
+    )
+
+    handler = OpbeatHandler(client)
+    logger.addHandler(handler)
+
+    # install(OpbeatBottle(client))
+
+    app = Opbeat(app, client)
 
 if __name__ == '__main__':
     main()
