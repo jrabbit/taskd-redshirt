@@ -98,11 +98,6 @@ def index():
     return "<h1>Welcome to redshirt on {}.<h1>".format(hostname)
 
 
-@route("/exception")
-def exception():
-    1 / 0
-
-
 @route("/add_user/<org>/<name>")
 def add_user(org, name):
     # may fail if group doesn't exist.
