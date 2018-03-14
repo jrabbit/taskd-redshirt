@@ -189,15 +189,19 @@ def open_txn():
     client.begin_transaction("web.bottle")
 
 @attr.s
-class InfluxClientelle(object):
-    influx_host = attr.ib(default="telegraf") # assume container/compose env
+class InfluxClientele(object):
+    influx_host = attr.ib(default=os.getenv("INFLUX_HOST", "telegraf")) # assume container/compose env
     influx_user = attr.ib(default=None)
+    influx_password = attr.ib(default=None)
     influx_database = attr.ib(default="telegraf")
     influx_port = attr.ib(default=os.getenv("INFLUX_PORT" ,8086)) # This is the influx direct port telegraf uses 8094
     reporting_host = attr.ib(default=socket.gethostname())
 
     def __attrs_post_init__(self):
-        self.client = InfluxDBClient(self.influx_host, self.influx_port, self.influx_user, None, self.influx_database, use_udp=True, udp_port=8094)
+        if True:
+            self.client = InfluxDBClient(self.influx_host, self.influx_port, self.influx_user, self.influx_password, self.influx_database, use_udp=True, udp_port=8094)
+        else:
+            self.client = InfluxDBClient(self.influx_host, self.influx_port, self.influx_user, self.influx_password, self.influx_database)
 
     def begin_transaction(self, txn_type):
         self.start = time.time()
@@ -229,7 +233,7 @@ app = default_app()
 if os.getenv("REDSHIRT_OPBEAT", False):
     logger.info("OPBEAT enabled!")
     # app.catchall = False  # Now most exceptions are re-raised within bottle.
-    client = InfluxClientelle()
+    client = InfluxClientele()
     # client = Client(
     #     organization_id=os.getenv("OPBEAT_ORG_ID"),
     #     app_id=os.getenv("OPBEAT_APP_ID"),
