@@ -5,6 +5,7 @@ import os
 import shutil
 import socket
 import time
+from datetime import datetime
 from subprocess import check_output
 
 import attr
@@ -14,7 +15,7 @@ import psutil
 import requests
 from bottle import (HTTPError, default_app, hook, install, request, response,
                     route, run, static_file, template)
-
+from influxdb import InfluxDBClient
 
 __version__ = "0.3.0"
 logger = logging.getLogger(__name__)
@@ -192,9 +193,14 @@ class InfluxClientelle(object):
     influx_host = attr.ib(default="eddie.getpizza.cat")
     influx_user = attr.ib(default=None)
     influx_database = attr.ib(default="telegraf")
+    reporting_host = attr.ib(default=socket.gethostname())
+
+    def __attrs_post_init__(self):
+        self.client = InfluxDBClient(self.influx_host, 8086, None, None, self.influx_database)
 
     def begin_transaction(self, txn_type):
         self.start = time.time()
+        self.txn_type = txn_type
 
     def end_transaction(self, path, status):
         # send txn to influx now
@@ -204,7 +210,17 @@ class InfluxClientelle(object):
 
     def _send_to_influx(self, path, status, duration):
         logger.debug("entered _send_to_influx")
-        logger.info((path, status, duration))
+        data = [{"measurement": "redshirt_request",
+                 "tags": {"type": self.txn_type,
+                          "host": self.reporting_host},
+                 "time": datetime.now(),
+                 "fields": {
+                     "value": duration,
+                     "status_code": status,
+                     "path": path,
+                 }}]
+        self.client.write_points(data)
+        # logger.info((path, status, duration))
 
 
 logging.basicConfig(level=logging.DEBUG)
