@@ -21,6 +21,14 @@ def publish():
     local("docker push jrabbit/redshirt")
 
 @task
+def outdated():
+    local("docker run -it --rm {} pipenv run pip list -o --format=columns".format(docker_name))
+
+@task
+def apt_outdated():
+    local("docker run -it --rm {} bash -c 'apt-get update && apt list --upgradable'".format(docker_name))
+
+@task
 def login():
     local("gcloud docker -a")
 

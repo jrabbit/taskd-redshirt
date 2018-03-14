@@ -1,5 +1,6 @@
 FROM debian:stretch
-MAINTAINER Jack Laxson <jackjrabbit@gmail.com>
+
+LABEL maintainer "jack@getpizza.cat"
 
 RUN mkdir -p /usr/src/redshirt
 
