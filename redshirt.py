@@ -180,13 +180,7 @@ def main(host, port, verbose, debug):
     run(host=host, port=int(os.getenv("PORT", port)), reloader=True)
 
 
-@hook("after_request")
-def close_txn():
-    client.end_transaction(request.path, response.status_code)
 
-@hook("before_request")
-def open_txn():
-    client.begin_transaction("web.bottle")
 
 @attr.s
 class InfluxClientele(object):
@@ -231,6 +225,14 @@ class InfluxClientele(object):
 logging.basicConfig(level=logging.DEBUG)
 app = default_app()
 if os.getenv("REDSHIRT_OPBEAT", False):
+    @hook("after_request")
+    def close_txn():
+        client.end_transaction(request.path, response.status_code)
+
+    @hook("before_request")
+    def open_txn():
+        client.begin_transaction("web.bottle")
+
     logger.info("OPBEAT enabled!")
     # app.catchall = False  # Now most exceptions are re-raised within bottle.
     client = InfluxClientele()
