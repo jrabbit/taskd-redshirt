@@ -208,19 +208,18 @@ class InfluxClientele(object):
         self._send_txn_to_influx(path, status, duration)
 
     def _send_txn_to_influx(self, path, status, duration):
-        logger.debug("entered _send_txn_to_influx")
+        # logger.debug("entered _send_txn_to_influx")
         data = [{"measurement": "redshirt_request",
                  "tags": {"type": self.txn_type,
-                          "host": self.reporting_host},
+                          "host": self.reporting_host,
+                          "app": "redshirt",
+                          "status_code": status,
+                          "path": path, },
                  "time": datetime.now(),
                  "fields": {
                      "value": duration,
-                     "status_code": status,
-                     "path": path,
                  }}]
         self.client.write_points(data)
-        # logger.info((path, status, duration))
-
 
 logging.basicConfig(level=logging.DEBUG)
 app = default_app()
