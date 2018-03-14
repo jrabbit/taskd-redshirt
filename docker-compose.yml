@@ -18,7 +18,7 @@ services:
             retries: 3
         ports:
             - 5000:4000
-        command: pipenv run gunicorn  --statsd-host=telegraf:8125 -b 0.0.0.0:4000 redshirt:app
+        command: pipenv run gunicorn --reload --statsd-host=telegraf:8125 -b 0.0.0.0:4000 redshirt:app
 
     taskd:
         image: "jrabbit/taskd:latest"

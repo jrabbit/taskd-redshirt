@@ -17,7 +17,7 @@ from bottle import (HTTPError, default_app, hook, install, request, response,
                     route, run, static_file, template)
 from influxdb import InfluxDBClient
 
-__version__ = "0.3.0"
+__version__ = "0.3.0b1"
 logger = logging.getLogger(__name__)
 DATA_DIR = os.getenv("TASKDDATA", "/var/lib/taskd")
 
@@ -212,7 +212,6 @@ class InfluxClientele(object):
         data = [{"measurement": "redshirt_request",
                  "tags": {"type": self.txn_type,
                           "host": self.reporting_host,
-                          "app": "redshirt",
                           "status_code": status,
                           "path": path, },
                  "time": datetime.now(),
