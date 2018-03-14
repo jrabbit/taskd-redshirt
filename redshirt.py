@@ -4,20 +4,19 @@ import logging
 import os
 import shutil
 import socket
+import time
 from subprocess import check_output
 
+import attr
 import click
 import packaging.version
 import psutil
 import requests
-from bottle import (HTTPError, default_app, request, route, run, static_file,
-                    template, install, hook, response)
-from opbeat import Client
-from opbeat.middleware import Opbeat
-from opbeat.handlers.logging import OpbeatHandler
+from bottle import (HTTPError, default_app, hook, install, request, response,
+                    route, run, static_file, template)
 
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 logger = logging.getLogger(__name__)
 DATA_DIR = os.getenv("TASKDDATA", "/var/lib/taskd")
 
@@ -188,21 +187,38 @@ def close_txn():
 def open_txn():
     client.begin_transaction("web.bottle")
 
+@attr.s
+class InfluxClientelle(object):
+    influx_host = attr.ib(default="eddie.getpizza.cat")
+    influx_user = attr.ib(default=None)
+    influx_database = attr.ib(default="telegraf")
+
+    def begin_transaction(self, txn_type):
+        self.start = time.time()
+
+    def end_transaction(self, path, status):
+        # send txn to influx now
+        end = time.time()
+        duration = self.start - end
+        self.send_to_influx(path, status, duration)
+
+
 logging.basicConfig(level=logging.DEBUG)
 app = default_app()
 if os.getenv("REDSHIRT_OPBEAT", False):
     logger.info("OPBEAT enabled!")
-    app.catchall = False  # Now most exceptions are re-raised within bottle.
-    client = Client(
-        organization_id=os.getenv("OPBEAT_ORG_ID"),
-        app_id=os.getenv("OPBEAT_APP_ID"),
-        secret_token=os.getenv("OPBEAT_SECRET_TOKEN"),
-    )
+    # app.catchall = False  # Now most exceptions are re-raised within bottle.
+    client = InfluxClientelle()
+    # client = Client(
+    #     organization_id=os.getenv("OPBEAT_ORG_ID"),
+    #     app_id=os.getenv("OPBEAT_APP_ID"),
+    #     secret_token=os.getenv("OPBEAT_SECRET_TOKEN"),
+    # )
 
-    handler = OpbeatHandler(client)
-    logger.addHandler(handler)
+    # handler = OpbeatHandler(client)
+    # logger.addHandler(handler)
 
-    app = Opbeat(app, client)
+    # app = Opbeat(app, client)
 
 if __name__ == '__main__':
     main()

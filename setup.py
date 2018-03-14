@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name="redshirt",
-      version="0.1.3b1",
+      version="0.3.0",
       scripts=['redshirt.py'],
       author="Jack Laxson",
       author_email="jack@getpizza.cat",
@@ -11,11 +11,12 @@ setup(name="redshirt",
       keywords=["taskd", "taskwarrior", "api", "management"],
       license="GPL v3",
       zip_safe=False,
-      install_requires=["bottle", "click", "psutil", "packaging", "requests"],
+      install_requires=["bottle", "click", "psutil", "packaging", "requests", "attrs"],
       url="https://github.com/jrabbit/taskd-redshirt",
       classifiers=["Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
                    "Topic :: System :: Monitoring",
                    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
                    "Programming Language :: Python :: 2.7",
                    "Programming Language :: Python :: 3.5",
+                   "Programming Language :: Python :: 3.6",
                    ])
