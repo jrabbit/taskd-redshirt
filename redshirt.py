@@ -190,13 +190,14 @@ def open_txn():
 
 @attr.s
 class InfluxClientelle(object):
-    influx_host = attr.ib(default="eddie.getpizza.cat")
+    influx_host = attr.ib(default="telegraf") # assume container/compose env
     influx_user = attr.ib(default=None)
     influx_database = attr.ib(default="telegraf")
+    influx_port = attr.ib(default=os.getenv("INFLUX_PORT" ,8086)) # This is the influx direct port telegraf uses 8094
     reporting_host = attr.ib(default=socket.gethostname())
 
     def __attrs_post_init__(self):
-        self.client = InfluxDBClient(self.influx_host, 8086, None, None, self.influx_database)
+        self.client = InfluxDBClient(self.influx_host, self.influx_port, self.influx_user, None, self.influx_database, use_udp=True, udp_port=8094)
 
     def begin_transaction(self, txn_type):
         self.start = time.time()
@@ -206,10 +207,10 @@ class InfluxClientelle(object):
         # send txn to influx now
         end = time.time()
         duration = (end - self.start) * 1000
-        self._send_to_influx(path, status, duration)
+        self._send_txn_to_influx(path, status, duration)
 
-    def _send_to_influx(self, path, status, duration):
-        logger.debug("entered _send_to_influx")
+    def _send_txn_to_influx(self, path, status, duration):
+        logger.debug("entered _send_txn_to_influx")
         data = [{"measurement": "redshirt_request",
                  "tags": {"type": self.txn_type,
                           "host": self.reporting_host},

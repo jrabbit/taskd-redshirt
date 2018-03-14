@@ -71,6 +71,15 @@ See gunicorn_ for configuration options.
 
 .. _gunicorn: http://docs.gunicorn.org/en/latest/run.html
 
+
+Configuration
+=============
+
+New in 0.3.0!
+
+Redshirt supports transaction and other data logging to influxdb.
+
+
 Indices and tables
 ==================
 

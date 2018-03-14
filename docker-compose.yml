@@ -1,0 +1,34 @@
+version: "3"
+services:
+    # ... web etc go here
+    redshirt:
+        image: "jrabbit/redshirt:latest"
+        build: .
+        volumes:
+            # - ./pki:/var/lib/taskd/pki
+            - certs:/var/lib/taskd
+            - .:/usr/src/redshirt/
+        security_opt:
+            - no-new-privileges
+        env_file: .env
+        healthcheck:
+            test: curl -f http://localhost:4000/meta/health
+            interval: 1m30s
+            timeout: 10s
+            retries: 3
+        ports:
+            - 5000:4000
+        command: pipenv run gunicorn  --statsd-host=telegraf:8125 -b 0.0.0.0:4000 redshirt:app
+
+    taskd:
+        image: "jrabbit/taskd:latest"
+        ports:
+            - "53589:53589"
+        volumes:
+            - certs:/var/lib/taskd
+    telegraf:
+        image: "telegraf"
+        volumes:
+            - ./example/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+volumes:
+    certs: {}
