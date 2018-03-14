@@ -199,8 +199,12 @@ class InfluxClientelle(object):
     def end_transaction(self, path, status):
         # send txn to influx now
         end = time.time()
-        duration = self.start - end
-        self.send_to_influx(path, status, duration)
+        duration = (end - self.start) * 1000
+        self._send_to_influx(path, status, duration)
+
+    def _send_to_influx(self, path, status, duration):
+        logger.debug("entered _send_to_influx")
+        logger.info((path, status, duration))
 
 
 logging.basicConfig(level=logging.DEBUG)
