@@ -16,6 +16,8 @@ import requests
 from bottle import (HTTPError, default_app, hook, install, request, response,
                     route, run, static_file, template)
 from influxdb import InfluxDBClient
+from raven import Client
+from raven.contrib.bottle import Sentry
 
 __version__ = "0.3.0b1"
 logger = logging.getLogger(__name__)
@@ -244,6 +246,10 @@ if os.getenv("REDSHIRT_OPBEAT", False):
     # logger.addHandler(handler)
 
     # app = Opbeat(app, client)
+
+if os.getenv("SENTRY_URL", False):
+    raven_client = Client(os.getenv("SENTRY_URL"))
+    app = Sentry(app, raven_client)
 
 if __name__ == '__main__':
     main()
