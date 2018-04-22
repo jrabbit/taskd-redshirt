@@ -6,6 +6,7 @@ name = "pypi"
 [dev-packages]
 mock = "*"
 coverage = "*"
+funcsigs = "*"
 
 [packages]
 baker = "==1.3"
