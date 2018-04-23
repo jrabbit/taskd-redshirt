@@ -1,0 +1,6 @@
+organization = Göteborg Bit Factory
+cn = localhost
+expiration_days = 365
+tls_www_client
+encryption_key
+signing_key

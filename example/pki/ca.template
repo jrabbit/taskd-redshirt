@@ -1,0 +1,7 @@
+organization = Göteborg Bit Factory
+cn = localhost CA
+country = SE
+state = Västra Götaland
+locality = Göteborg
+expiration_days = 365
+ca
