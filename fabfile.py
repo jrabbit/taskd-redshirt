@@ -1,5 +1,4 @@
-from fabric.api import *
-from fabric.contrib import project
+from fabric.api import task, local 
 
 @task
 def update_deps():

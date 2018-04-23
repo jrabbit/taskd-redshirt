@@ -146,7 +146,7 @@ def install_cert():
 
 @route("/user/<org>/<user>", method="DELETE")
 def remove_user(user, org):
-    yolo = _call_or_503(["taskd", "remove", "user", org, user])
+    _call_or_503(["taskd", "remove", "user", org, user])
     return "OK"
 
 
@@ -180,8 +180,6 @@ def main(host, port, verbose, debug):
         logging.basicConfig(level=logging.INFO)
 
     run(host=host, port=int(os.getenv("PORT", port)), reloader=True)
-
-
 
 
 @attr.s
@@ -224,7 +222,8 @@ class InfluxClientele(object):
 
 logging.basicConfig(level=logging.DEBUG)
 app = default_app()
-if os.getenv("REDSHIRT_OPBEAT", False):
+if os.getenv("REDSHIRT_OPBEAT", False) or os.getenv("REDSHIRT_TICK", False):
+    client = InfluxClientele()
     @hook("after_request")
     def close_txn():
         client.end_transaction(request.path, response.status_code)
@@ -233,19 +232,8 @@ if os.getenv("REDSHIRT_OPBEAT", False):
     def open_txn():
         client.begin_transaction("web.bottle")
 
-    logger.info("OPBEAT enabled!")
+    logger.info("telegraf APM enabled!")
     # app.catchall = False  # Now most exceptions are re-raised within bottle.
-    client = InfluxClientele()
-    # client = Client(
-    #     organization_id=os.getenv("OPBEAT_ORG_ID"),
-    #     app_id=os.getenv("OPBEAT_APP_ID"),
-    #     secret_token=os.getenv("OPBEAT_SECRET_TOKEN"),
-    # )
-
-    # handler = OpbeatHandler(client)
-    # logger.addHandler(handler)
-
-    # app = Opbeat(app, client)
 
 if os.getenv("SENTRY_URL", False):
     raven_client = Client(os.getenv("SENTRY_URL"))
