@@ -1,5 +1,4 @@
-from fabric.api import *
-from fabric.contrib import project
+from fabric.api import task, local 
 
 @task
 def update_deps():
@@ -19,6 +18,14 @@ def push():
 def publish():
     local("docker tag {} jrabbit/redshirt".format(docker_name))
     local("docker push jrabbit/redshirt")
+
+@task
+def outdated():
+    local("docker run -it --rm {} pipenv run pip list -o --format=columns".format(docker_name))
+
+@task
+def apt_outdated():
+    local("docker run -it --rm {} bash -c 'apt-get update && apt list --upgradable'".format(docker_name))
 
 @task
 def login():

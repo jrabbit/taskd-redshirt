@@ -4,20 +4,22 @@ import logging
 import os
 import shutil
 import socket
+import time
+from datetime import datetime
 from subprocess import check_output
 
+import attr
 import click
 import packaging.version
 import psutil
 import requests
-from bottle import (HTTPError, default_app, request, route, run, static_file,
-                    template, install, hook, response)
-from opbeat import Client
-from opbeat.middleware import Opbeat
-from opbeat.handlers.logging import OpbeatHandler
+from bottle import (HTTPError, default_app, hook, install, request, response,
+                    route, run, static_file, template)
+from influxdb import InfluxDBClient
+from raven import Client
+from raven.contrib.bottle import Sentry
 
-
-__version__ = "0.2.0"
+__version__ = "0.3.0b1"
 logger = logging.getLogger(__name__)
 DATA_DIR = os.getenv("TASKDDATA", "/var/lib/taskd")
 
@@ -144,7 +146,7 @@ def install_cert():
 
 @route("/user/<org>/<user>", method="DELETE")
 def remove_user(user, org):
-    yolo = _call_or_503(["taskd", "remove", "user", org, user])
+    _call_or_503(["taskd", "remove", "user", org, user])
     return "OK"
 
 
@@ -180,29 +182,62 @@ def main(host, port, verbose, debug):
     run(host=host, port=int(os.getenv("PORT", port)), reloader=True)
 
 
-@hook("after_request")
-def close_txn():
-    client.end_transaction(request.path, response.status_code)
+@attr.s
+class InfluxClientele(object):
+    influx_host = attr.ib(default=os.getenv("INFLUX_HOST", "telegraf")) # assume container/compose env
+    influx_user = attr.ib(default=None)
+    influx_password = attr.ib(default=None)
+    influx_database = attr.ib(default="telegraf")
+    influx_port = attr.ib(default=os.getenv("INFLUX_PORT" ,8086)) # This is the influx direct port telegraf uses 8094
+    reporting_host = attr.ib(default=socket.gethostname())
 
-@hook("before_request")
-def open_txn():
-    client.begin_transaction("web.bottle")
+    def __attrs_post_init__(self):
+        if True:
+            self.client = InfluxDBClient(self.influx_host, self.influx_port, self.influx_user, self.influx_password, self.influx_database, use_udp=True, udp_port=8094)
+        else:
+            self.client = InfluxDBClient(self.influx_host, self.influx_port, self.influx_user, self.influx_password, self.influx_database)
+
+    def begin_transaction(self, txn_type):
+        self.start = time.time()
+        self.txn_type = txn_type
+
+    def end_transaction(self, path, status):
+        # send txn to influx now
+        end = time.time()
+        duration = (end - self.start) * 1000
+        self._send_txn_to_influx(path, status, duration)
+
+    def _send_txn_to_influx(self, path, status, duration):
+        # logger.debug("entered _send_txn_to_influx")
+        data = [{"measurement": "redshirt_request",
+                 "tags": {"type": self.txn_type,
+                          "host": self.reporting_host,
+                          "status_code": status,
+                          "path": path, },
+                 "time": datetime.now(),
+                 "fields": {
+                     "value": duration,
+                 }}]
+        self.client.write_points(data)
 
 logging.basicConfig(level=logging.DEBUG)
 app = default_app()
-if os.getenv("REDSHIRT_OPBEAT", False):
-    logger.info("OPBEAT enabled!")
-    app.catchall = False  # Now most exceptions are re-raised within bottle.
-    client = Client(
-        organization_id=os.getenv("OPBEAT_ORG_ID"),
-        app_id=os.getenv("OPBEAT_APP_ID"),
-        secret_token=os.getenv("OPBEAT_SECRET_TOKEN"),
-    )
+if os.getenv("REDSHIRT_OPBEAT", False) or os.getenv("REDSHIRT_TICK", False):
+    client = InfluxClientele()
+    @hook("after_request")
+    def close_txn():
+        client.end_transaction(request.path, response.status_code)
 
-    handler = OpbeatHandler(client)
-    logger.addHandler(handler)
+    @hook("before_request")
+    def open_txn():
+        client.begin_transaction("web.bottle")
 
-    app = Opbeat(app, client)
+    logger.info("telegraf APM enabled!")
+    # app.catchall = False  # Now most exceptions are re-raised within bottle.
+
+if os.getenv("SENTRY_URL", False):
+    raven_client = Client(os.getenv("SENTRY_URL"))
+    app = Sentry(app, raven_client)
 
 if __name__ == '__main__':
     main()

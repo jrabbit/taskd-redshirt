@@ -90,3 +90,4 @@ ENV/
 
 # vim
 *.sw*
+.mypy_cache

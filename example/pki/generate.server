@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# Take the correct binary to create the certificates
+CERTTOOL=$(which gnutls-certtool 2>/dev/null || which certtool 2>/dev/null)
+if [ -z "$CERTTOOL" ]
+then
+  echo "ERROR: No certtool found" >&2
+  exit 1
+fi
+
+. ./vars
+
+if ! [ -f server.key.pem ]
+then
+  # Create a server key.
+  $CERTTOOL \
+    --generate-privkey \
+    --bits $BITS \
+    --outfile server.key.pem
+fi
+
+chmod 600 server.key.pem
+
+if ! [ -f server.template ]
+then
+  cat <<EOF >server.template
+organization = $ORGANIZATION
+cn = $CN
+expiration_days = $EXPIRATION_DAYS
+tls_www_server
+encryption_key
+signing_key
+EOF
+fi
+
+if ! [ -f server.cert.pem ] || [ server.template -nt server.cert.pem ]
+then
+  $CERTTOOL \
+    --generate-certificate \
+    --load-privkey server.key.pem \
+    --load-ca-certificate ca.cert.pem \
+    --load-ca-privkey ca.key.pem \
+    --template server.template \
+    --outfile server.cert.pem
+fi
+
+chmod 600 server.cert.pem
