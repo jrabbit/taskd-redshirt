@@ -9,9 +9,8 @@ coverage = "*"
 funcsigs = "*"
 
 [packages]
-baker = "==1.3"
 bottle = "==0.12.13"
-gunicorn = "==19.7.1"
+gunicorn = ">=19.7.1"
 psutil = ">=4.3.0"
 requests = ">=2.18"
 click = "*"
