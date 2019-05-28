@@ -76,11 +76,11 @@
         },
         "influxdb": {
             "hashes": [
-                "sha256:43b2fde195ee2302cfa87c8a0e1d29429f175ed584516d02e04f9b2c3c2ac2ad",
-                "sha256:6adba2ddfd5781a06b5204339e679d66645bf6cc2b7f493eb9d7c8986d714e80"
+                "sha256:98ef84817d8993d9c826aa76cf7254b4ce616f3b14c1f98a705370fd5cbaa509",
+                "sha256:afeff28953a91b4ea1aebf9b5b8258a4488d0e49e2471db15ea43fd2c8533143"
             ],
             "index": "pypi",
-            "version": "==5.0.0"
+            "version": "==5.2.2"
         },
         "opbeat": {
             "hashes": [
