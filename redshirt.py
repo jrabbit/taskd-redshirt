@@ -222,7 +222,7 @@ class InfluxClientele(object):
 
 logging.basicConfig(level=logging.DEBUG)
 app = default_app()
-if os.getenv("REDSHIRT_OPBEAT", False) or os.getenv("REDSHIRT_TICK", False):
+if os.getenv("REDSHIRT_TICK", False):
     client = InfluxClientele()
     @hook("after_request")
     def close_txn():
