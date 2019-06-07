@@ -17,4 +17,4 @@ six
 snowballstemmer==1.2.1
 Sphinx<2
 sphinx-autobuild
-tornado<6
+tornado<7
