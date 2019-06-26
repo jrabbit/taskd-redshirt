@@ -14,7 +14,7 @@ pytz
 PyYAML==5.1
 singledispatch==3.4.0.3
 six
-snowballstemmer==1.2.1
+snowballstemmer==1.9.0
 Sphinx<2
 sphinx-autobuild
 tornado<6
