@@ -4,7 +4,7 @@ Babel
 backports-abc
 backports.ssl-match-hostname
 certifi
-docutils==0.14
+docutils==0.15.1
 Jinja2==2.10.1
 livereload
 MarkupSafe==1.1.1
