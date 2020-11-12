@@ -9,7 +9,7 @@ coverage = "*"
 funcsigs = "*"
 
 [packages]
-bottle = "==0.12.16"
+bottle = "==0.12.19"
 gunicorn = ">=19.7.1"
 psutil = ">=4.3.0"
 requests = ">=2.18"
